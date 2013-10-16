@@ -5,7 +5,7 @@ var vows = require("vows"),
 var suite = vows.describe("metric-expression");
 
 suite.addBatch({
-
+  
   "a simple unary expression, sum(test)": {
     topic: parser.parse("sum(test)"),
     "is unary (has no associated binary operator)": function(e) {
@@ -295,9 +295,19 @@ suite.addBatch({
       var filter = {};
       parser.parse("sum(test.in(i, [\"foo\", 42]))").filter(filter);
       assert.deepEqual(filter, {"d.i": {$in: ["foo", 42]}});
+    },
+  },
+  "lock expression": {
+    "lock expression merges additional filters": function() {
+      var filter = {};
+      parser.parse("sum(test.gt(i, 42)):test.le(i, 52)").filter(filter);
+      assert.deepEqual(filter, {"d.i": {$gt: 42, $lte: 52}});
+    },
+    "lock expression results in expected type": function() {
+      var e = parser.parse("sum(test1.gt(i, 42)):test.le(i, 52)");
+      assert.equal(e.type, "test") 
     }
   }
-
 });
 
 suite.export(module);

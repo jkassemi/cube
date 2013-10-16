@@ -236,8 +236,18 @@ suite.addBatch({
       parser.parse("test.in(i, [\"foo\", 42])").filter(filter);
       assert.deepEqual(filter, {"d.i": {$in: ["foo", 42]}});
     }
+  },
+  "lock expression": {
+    "lock expression merges additional filters": function() {
+      var filter = {};
+      parser.parse("test.gt(i, 42):test.le(i, 52)").filter(filter);
+      assert.deepEqual(filter, {"d.i": {$gt: 42, $lte: 52}});
+    },
+    "lock expression results in expected type": function() {
+      var e = parser.parse("test1.gt(i, 42):test.le(i, 52)");
+      assert.equal(e.type, "test") 
+    }
   }
-
 });
 
 suite.export(module);

@@ -73,7 +73,14 @@
 }
 
 start
-  = _ expression:event_expression _ { expression.source = input; return expression; }
+  = _ expression:event_expression _ ":" _ lock_expression:event_expression _
+{
+    var uf = expression.filter;
+    expression.type = lock_expression.type;
+    expression.filter = function(filter) { uf(filter); lock_expression.filter(filter); }; 
+    return expression;
+  }
+  / _ expression:event_expression _ { expression.source = input; return expression; }
 
 event_expression
   = value:event_value_expression filters:(_ "." _ event_filter_expression)*

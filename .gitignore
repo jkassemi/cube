@@ -1,3 +1,6 @@
 node_modules
 .jshintrc
 Procfile
+*.un~
+*.swo
+*.swp

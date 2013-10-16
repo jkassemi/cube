@@ -104,7 +104,14 @@
 }
 
 start
-  = _ expression:metric_additive_expression _ { return expression; }
+  = _ expression:metric_additive_expression _ ":" _ lock_expression:event_expression _ 
+{ 
+    var uf = expression.filter; 
+    expression.type = lock_expression.type;
+    expression.filter = function(filter){ uf(filter); lock_expression.filter(filter); }; 
+    return expression; 
+  }
+  / _ expression:metric_additive_expression _ { return expression; }
 
 metric_additive_expression
   = head:metric_multiplicative_expression tail:(_ additive_operator _ metric_additive_expression)* { return compoundMetric(head, tail); }
